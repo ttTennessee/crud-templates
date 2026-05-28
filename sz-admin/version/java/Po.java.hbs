@@ -1,0 +1,40 @@
+---
+basePath: "java/{{package_path}}/pojo/po"
+filename: "{{model_pascal}}.java"
+---
+package {{package}}.{{domain}}.pojo.po;
+
+import com.mybatisflex.annotation.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+import java.io.Serial;
+import java.io.Serializable;
+
+/**
+ * <p>
+ * {{table_comment}}
+ * </p>
+ *
+ * @author {{git_user_name}}
+ * @since {{datetime}}
+ */
+@Data
+@Accessors(chain = true)
+@Table(value = "{{table}}")
+@Schema(description = "{{table_comment}}")
+public class {{model_pascal}} implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+{{#each fields}}
+{{#if is_pk}}
+    @Id(keyType = KeyType.Auto)
+{{/if}}
+    @Schema(description = "{{name}}")
+    private {{type}} {{name_camel}};
+
+{{/each}}
+}

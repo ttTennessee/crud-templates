@@ -1,0 +1,24 @@
+[has_import]
+description = "是否生成导入按钮和 importExcel 接口"
+type = "bool"
+default = false
+
+[has_export]
+description = "是否生成导出接口"
+type = "bool"
+default = false
+
+[btn_permission]
+description = "是否生成 @SaCheckPermission 注解"
+type = "bool"
+default = true
+
+[table_comment]
+description = "表的业务说明，用于 Swagger 注解和类文档"
+type = "string"
+required = true
+
+[domain]
+description = "包名末段（如 com.sz.admin.test → test），用于 mapper xml 子目录隔离"
+type = "string"
+required = true

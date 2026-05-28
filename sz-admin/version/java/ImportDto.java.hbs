@@ -1,0 +1,33 @@
+---
+basePath: "java/{{package_path}}/pojo/dto"
+filename: "{{model_pascal}}ImportDTO.java"
+---
+package {{package}}.{{domain}}.pojo.dto;
+
+import cn.idev.excel.annotation.ExcelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+/**
+ * <p>
+ * {{model_pascal}} 导入DTO
+ * </p>
+ *
+ * @author {{git_user_name}}
+ * @since {{datetime}}
+ */
+@Data
+@Accessors(chain = true)
+@Schema(description = "{{model_pascal}}导入DTO")
+public class {{model_pascal}}ImportDTO {
+
+{{#each fields}}
+{{#unless is_pk}}
+    @ExcelProperty(value = "{{name}}")
+    @Schema(description = "{{name}}")
+    private {{type}} {{name_camel}};
+
+{{/unless}}
+{{/each}}
+}

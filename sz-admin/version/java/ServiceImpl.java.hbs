@@ -1,0 +1,117 @@
+---
+basePath: "java/{{package_path}}/service/impl"
+filename: "{{model_pascal}}ServiceImpl.java"
+---
+package {{package}}.{{domain}}.service.impl;
+
+import com.mybatisflex.spring.service.impl.ServiceImpl;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import com.sz.core.common.entity.PageResult;
+import com.sz.core.common.entity.SelectIdsDTO;
+import com.sz.core.common.enums.CommonResponseEnum;
+import com.sz.core.util.BeanCopyUtils;
+import com.sz.core.util.PageUtils;
+
+import java.io.Serializable;
+import java.util.List;
+
+import {{package}}.{{domain}}.mapper.{{model_pascal}}Mapper;
+import {{package}}.{{domain}}.pojo.po.{{model_pascal}};
+import {{package}}.{{domain}}.pojo.dto.{{model_pascal}}CreateDTO;
+import {{package}}.{{domain}}.pojo.dto.{{model_pascal}}UpdateDTO;
+import {{package}}.{{domain}}.pojo.dto.{{model_pascal}}ListDTO;
+import {{package}}.{{domain}}.pojo.vo.{{model_pascal}}VO;
+import {{package}}.{{domain}}.service.{{model_pascal}}Service;
+{{#if has_import}}
+import com.sz.core.common.entity.ImportExcelDTO;
+import com.sz.excel.core.ExcelResult;
+import com.sz.excel.utils.ExcelUtils;
+import {{package}}.{{domain}}.pojo.dto.{{model_pascal}}ImportDTO;
+import lombok.SneakyThrows;
+{{/if}}
+{{#if has_export}}
+{{#unless has_import}}
+import com.sz.excel.utils.ExcelUtils;
+import lombok.SneakyThrows;
+{{/unless}}
+import com.sz.core.util.FileUtils;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
+{{/if}}
+
+/**
+ * <p>
+ * {{table_comment}} 服务实现类
+ * </p>
+ *
+ * @author {{git_user_name}}
+ * @since {{datetime}}
+ */
+@Service
+@RequiredArgsConstructor
+public class {{model_pascal}}ServiceImpl extends ServiceImpl<{{model_pascal}}Mapper, {{model_pascal}}> implements {{model_pascal}}Service {
+
+    @Override
+    public void create({{model_pascal}}CreateDTO dto) {
+        {{model_pascal}} {{model_camel}} = BeanCopyUtils.copy(dto, {{model_pascal}}.class);
+        save({{model_camel}});
+    }
+
+    @Override
+    public void update({{model_pascal}}UpdateDTO dto) {
+        {{model_pascal}} {{model_camel}} = BeanCopyUtils.copy(dto, {{model_pascal}}.class);
+        saveOrUpdate({{model_camel}});
+    }
+
+    @Override
+    public PageResult<{{model_pascal}}VO> page({{model_pascal}}ListDTO dto) {
+        Page<{{model_pascal}}VO> page = pageAs(PageUtils.getPage(dto), buildQueryWrapper(dto), {{model_pascal}}VO.class);
+        return PageUtils.getPageResult(page);
+    }
+
+    @Override
+    public List<{{model_pascal}}VO> list({{model_pascal}}ListDTO dto) {
+        return listAs(buildQueryWrapper(dto), {{model_pascal}}VO.class);
+    }
+
+    @Override
+    public void remove(SelectIdsDTO dto) {
+        CommonResponseEnum.INVALID_ID.assertTrue(dto.getIds().isEmpty());
+        removeByIds(dto.getIds());
+    }
+
+    @Override
+    public {{model_pascal}}VO detail(Object id) {
+        {{model_pascal}} {{model_camel}} = getById((Serializable) id);
+        CommonResponseEnum.INVALID_ID.assertNull({{model_camel}});
+        return BeanCopyUtils.copy({{model_camel}}, {{model_pascal}}VO.class);
+    }
+{{#if has_import}}
+
+    @SneakyThrows
+    @Override
+    public void importExcel(ImportExcelDTO dto) {
+        ExcelResult<{{model_pascal}}ImportDTO> excelResult = ExcelUtils.importExcel(dto.getFile().getInputStream(), {{model_pascal}}ImportDTO.class, true);
+        List<{{model_pascal}}ImportDTO> list = excelResult.getList();
+    }
+{{/if}}
+{{#if has_export}}
+
+    @SneakyThrows
+    @Override
+    public void exportExcel({{model_pascal}}ListDTO dto, HttpServletResponse response) {
+        List<{{model_pascal}}VO> list = list(dto);
+        String fileName = "{{table_comment}}模板";
+        OutputStream os = FileUtils.getOutputStream(response, fileName + ".xlsx");
+        ExcelUtils.exportExcel(list, "{{table_comment}}", {{model_pascal}}VO.class, os);
+    }
+{{/if}}
+
+    private static QueryWrapper buildQueryWrapper({{model_pascal}}ListDTO dto) {
+        return QueryWrapper.create().from({{model_pascal}}.class);
+    }
+}

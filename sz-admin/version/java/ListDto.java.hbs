@@ -1,0 +1,32 @@
+---
+basePath: "java/{{package_path}}/pojo/dto"
+filename: "{{model_pascal}}ListDTO.java"
+---
+package {{package}}.{{domain}}.pojo.dto;
+
+import com.sz.core.common.entity.PageQuery;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+/**
+ * <p>
+ * {{model_pascal}} 查询DTO
+ * </p>
+ *
+ * @author {{git_user_name}}
+ * @since {{datetime}}
+ */
+@Data
+@Accessors(chain = true)
+@Schema(description = "{{model_pascal}}查询DTO")
+public class {{model_pascal}}ListDTO extends PageQuery {
+
+{{#each fields}}
+{{#unless is_pk}}
+    @Schema(description = "{{name}}")
+    private {{type}} {{name_camel}};
+
+{{/unless}}
+{{/each}}
+}

@@ -1,0 +1,23 @@
+---
+basePath: "resources/mapper/{{domain}}"
+filename: "{{model_pascal}}Mapper.xml"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="{{package}}.{{domain}}.mapper.{{model_pascal}}Mapper">
+
+    <resultMap id="BaseResultMap" type="{{package}}.{{domain}}.pojo.po.{{model_pascal}}">
+{{#each fields}}
+{{#if is_pk}}
+        <id column="{{name}}" property="{{name_camel}}"/>
+{{else}}
+        <result column="{{name}}" property="{{name_camel}}"/>
+{{/if}}
+{{/each}}
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        {{#each fields}}{{name}}{{#unless @last}}, {{/unless}}{{/each}}
+    </sql>
+
+</mapper>

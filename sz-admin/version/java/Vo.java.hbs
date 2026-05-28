@@ -1,0 +1,35 @@
+---
+basePath: "java/{{package_path}}/pojo/vo"
+filename: "{{model_pascal}}VO.java"
+---
+package {{package}}.{{domain}}.pojo.vo;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.experimental.Accessors;
+{{#if has_export}}
+import cn.idev.excel.annotation.ExcelProperty;
+{{/if}}
+
+/**
+ * <p>
+ * {{model_pascal}} 返回VO
+ * </p>
+ *
+ * @author {{git_user_name}}
+ * @since {{datetime}}
+ */
+@Data
+@Accessors(chain = true)
+@Schema(description = "{{model_pascal}}返回VO")
+public class {{model_pascal}}VO {
+
+{{#each fields}}
+{{#if @root.has_export}}
+    @ExcelProperty(value = "{{name}}")
+{{/if}}
+    @Schema(description = "{{name}}")
+    private {{type}} {{name_camel}};
+
+{{/each}}
+}

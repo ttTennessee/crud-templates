@@ -1,0 +1,19 @@
+---
+basePath: "java/{{package_path}}/mapper"
+filename: "{{model_pascal}}Mapper.java"
+---
+package {{package}}.{{domain}}.mapper;
+
+import com.mybatisflex.core.BaseMapper;
+import {{package}}.{{domain}}.pojo.po.{{model_pascal}};
+
+/**
+ * <p>
+ * {{table_comment}} Mapper 接口
+ * </p>
+ *
+ * @author {{git_user_name}}
+ * @since {{datetime}}
+ */
+public interface {{model_pascal}}Mapper extends BaseMapper<{{model_pascal}}> {
+}

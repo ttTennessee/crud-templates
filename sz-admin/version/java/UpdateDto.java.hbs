@@ -1,0 +1,29 @@
+---
+basePath: "java/{{package_path}}/pojo/dto"
+filename: "{{model_pascal}}UpdateDTO.java"
+---
+package {{package}}.{{domain}}.pojo.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+/**
+ * <p>
+ * {{model_pascal}} 修改DTO
+ * </p>
+ *
+ * @author {{git_user_name}}
+ * @since {{datetime}}
+ */
+@Data
+@Accessors(chain = true)
+@Schema(description = "{{model_pascal}}修改DTO")
+public class {{model_pascal}}UpdateDTO {
+
+{{#each fields}}
+    @Schema(description = "{{name}}")
+    private {{type}} {{name_camel}};
+
+{{/each}}
+}

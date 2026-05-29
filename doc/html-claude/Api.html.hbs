@@ -1,0 +1,542 @@
+---
+basePath: "doc"
+filename: "{{model_kebab}}ApiDoc.html"
+---
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{{table_comment}} · API · {{model_pascal}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --paper:#faf9f5;
+    --paper-2:#f4f2ea;
+    --card:#ffffff;
+    --ink:#1f1e1c;
+    --ink-2:#403d37;
+    --muted:#6f6a5f;
+    --faint:#9c9587;
+    --line:#eae6db;
+    --line-2:#ded9cb;
+    --clay:#d97757;
+    --clay-deep:#bd5d3c;
+    --clay-soft:#f6e9e1;
+
+    --get:#2f855a;   --get-bg:#e9f1ec;
+    --post:#c2410c;  --post-bg:#f8ebe1;
+    --put:#2563a8;   --put-bg:#e7eef6;
+    --del:#c0392b;   --del-bg:#f7e8e5;
+    --aux:#7c4dbd;   --aux-bg:#efe8f7;
+
+    --radius:16px;
+    --radius-sm:10px;
+    --sbw:288px;
+    --maxw:1160px;
+    --shadow:0 1px 2px rgba(31,30,28,.04), 0 8px 24px -16px rgba(31,30,28,.18);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+
+  body{
+    font-family:"Schibsted Grotesk",system-ui,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  /* warm paper atmosphere */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(900px 460px at 82% -6%, rgba(217,119,87,.07), transparent 62%),
+      radial-gradient(760px 420px at -4% 8%, rgba(217,119,87,.04), transparent 60%);
+  }
+
+  ::selection{background:var(--clay-soft);color:var(--clay-deep)}
+
+  /* ============ LAYOUT ============ */
+  .shell{display:grid;grid-template-columns:var(--sbw) 1fr;max-width:var(--maxw);margin:0 auto;}
+
+  /* ---- sidebar ---- */
+  .side{
+    position:sticky;top:0;align-self:start;height:100vh;
+    padding:38px 24px 34px 30px;
+    border-right:1px solid var(--line);
+    display:flex;flex-direction:column;gap:28px;overflow-y:auto;
+  }
+  .side::-webkit-scrollbar{width:7px}
+  .side::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px}
+
+  .brand{display:flex;flex-direction:column;gap:11px}
+  .brand .kicker{
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--clay);font-weight:500;
+  }
+  .brand h2{
+    font-family:"Newsreader",serif;font-weight:500;font-size:27px;line-height:1.12;
+    letter-spacing:-.01em;color:var(--ink);
+  }
+  .brand .prefix{
+    font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);
+    background:var(--paper-2);border:1px solid var(--line);border-radius:8px;
+    padding:5px 10px;width:fit-content;
+  }
+
+  .nav-group{display:flex;flex-direction:column;gap:2px}
+  .nav-label{
+    font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--faint);margin:4px 0 8px 4px;
+  }
+  .nav-item{
+    display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--muted);
+    padding:7px 11px;border-radius:10px;font-size:14px;font-weight:500;
+    border:1px solid transparent;transition:.16s ease;position:relative;
+  }
+  .nav-item:hover{color:var(--ink);background:var(--paper-2);}
+  .nav-item.active{color:var(--clay-deep);background:var(--clay-soft);}
+  .nav-item.active::before{
+    content:"";position:absolute;left:-30px;top:50%;transform:translateY(-50%);
+    width:3px;height:17px;border-radius:3px;background:var(--clay);
+  }
+  .verb{
+    font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:600;
+    letter-spacing:.03em;padding:3px 6px;border-radius:6px;min-width:46px;text-align:center;
+  }
+  .v-get{color:var(--get);background:var(--get-bg)}
+  .v-post{color:var(--post);background:var(--post-bg)}
+  .v-put{color:var(--put);background:var(--put-bg)}
+  .v-del{color:var(--del);background:var(--del-bg)}
+  .v-aux{color:var(--aux);background:var(--aux-bg)}
+
+  .side-foot{
+    margin-top:auto;padding-top:18px;border-top:1px solid var(--line);
+    font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--faint);
+    display:flex;flex-direction:column;gap:6px;
+  }
+  .side-foot b{color:var(--muted);font-weight:500}
+
+  /* ---- main ---- */
+  main{padding:66px 64px 120px;min-width:0;}
+  section{scroll-margin-top:36px}
+
+  .reveal{opacity:0;transform:translateY(14px);animation:rise .65s cubic-bezier(.2,.7,.2,1) forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  /* ---- hero ---- */
+  .hero{margin-bottom:62px;max-width:760px}
+  .hero .eyebrow{
+    font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--clay);margin-bottom:22px;display:flex;
+    align-items:center;gap:14px;font-weight:500;
+  }
+  .hero .eyebrow::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line-2),transparent)}
+  .hero h1{
+    font-family:"Newsreader",serif;font-weight:500;font-size:clamp(42px,6vw,66px);
+    line-height:1.04;letter-spacing:-.02em;margin-bottom:10px;color:var(--ink);
+  }
+  .hero h1 em{font-style:italic;color:var(--clay);font-weight:400}
+  .hero .lede{font-size:18px;color:var(--ink-2);max-width:580px;margin-bottom:28px;line-height:1.6}
+  .hero .lede code{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--clay-deep);background:var(--clay-soft);padding:1px 7px;border-radius:6px}
+  .meta-row{display:flex;flex-wrap:wrap;gap:10px}
+  .chip{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);
+    background:var(--card);border:1px solid var(--line);border-radius:9px;padding:7px 13px;
+    box-shadow:var(--shadow);
+  }
+  .chip .dot{width:6px;height:6px;border-radius:50%;background:var(--clay)}
+  .chip b{color:var(--ink);font-weight:600}
+
+  /* ---- section heading ---- */
+  .s-head{display:flex;align-items:baseline;gap:16px;margin-bottom:26px}
+  .s-head h2{
+    font-family:"Newsreader",serif;font-weight:500;font-size:32px;letter-spacing:-.01em;color:var(--ink);
+  }
+  .s-head .idx{
+    font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--clay-deep);
+    background:var(--clay-soft);border-radius:7px;padding:3px 9px;font-weight:500;
+  }
+  .s-head .rule{flex:1;height:1px;background:var(--line);align-self:center}
+
+  /* ---- tables (shared) ---- */
+  .tbl{
+    width:100%;border-collapse:separate;border-spacing:0;margin-bottom:72px;
+    border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+    background:var(--card);box-shadow:var(--shadow);
+  }
+  .tbl thead th{
+    font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--faint);text-align:left;font-weight:500;
+    padding:14px 20px;background:var(--paper-2);border-bottom:1px solid var(--line);
+  }
+  .tbl tbody tr{transition:background .14s}
+  .tbl tbody tr:hover{background:#fdfcf8}
+  .tbl td{padding:13px 20px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:middle}
+  .tbl tbody tr:last-child td{border-bottom:none}
+  .tbl a.path{font-family:"IBM Plex Mono",monospace;color:var(--ink);text-decoration:none;font-size:13px}
+  .tbl a.path:hover{color:var(--clay-deep)}
+  .tbl code{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted)}
+
+  .fname{font-family:"IBM Plex Mono",monospace;color:var(--ink);font-weight:500}
+  .ftype{font-family:"IBM Plex Mono",monospace;color:var(--put);font-size:13px}
+  .pill{
+    display:inline-flex;align-items:center;font-family:"IBM Plex Mono",monospace;
+    font-size:10.5px;font-weight:600;padding:2px 9px;border-radius:20px;letter-spacing:.02em;
+  }
+  .pill.key{color:var(--clay-deep);background:var(--clay-soft)}
+  .pill.yes{color:var(--get);background:var(--get-bg)}
+  .pill.no{color:var(--faint);background:var(--paper-2);border:1px solid var(--line)}
+
+  /* ---- endpoint cards ---- */
+  .ep{
+    border:1px solid var(--line);border-radius:var(--radius);background:var(--card);
+    margin-bottom:20px;overflow:hidden;position:relative;
+    transition:border-color .2s, box-shadow .2s, transform .2s;box-shadow:var(--shadow);
+  }
+  .ep::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent,var(--clay))}
+  .ep:hover{border-color:var(--accent,var(--clay));transform:translateY(-1px);
+    box-shadow:0 2px 4px rgba(31,30,28,.05), 0 16px 36px -22px rgba(31,30,28,.28)}
+  .ep-head{display:flex;align-items:center;gap:14px;padding:19px 24px;flex-wrap:wrap}
+  .ep-verb{
+    font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;letter-spacing:.03em;
+    padding:6px 13px;border-radius:9px;min-width:66px;text-align:center;
+    color:var(--accent);background:var(--accent-bg);
+  }
+  .ep-path{
+    font-family:"IBM Plex Mono",monospace;font-size:16px;color:var(--ink);font-weight:500;
+    word-break:break-all;
+  }
+  .ep-path .param{color:var(--clay-deep)}
+  .ep-title{margin-left:auto;font-size:15px;color:var(--muted);font-style:italic;font-family:"Newsreader",serif}
+  .copy{
+    background:var(--paper-2);border:1px solid var(--line);color:var(--faint);
+    width:31px;height:31px;border-radius:9px;cursor:pointer;display:grid;place-items:center;
+    transition:.15s;flex-shrink:0;
+  }
+  .copy:hover{color:var(--clay-deep);border-color:var(--clay);background:var(--clay-soft)}
+  .copy svg{width:14px;height:14px}
+  .copy.ok{color:var(--get);border-color:var(--get);background:var(--get-bg)}
+
+  .ep-body{padding:0 24px 6px;border-top:1px solid var(--line)}
+  .spec{display:grid;grid-template-columns:110px 1fr;gap:0}
+  .spec dt{
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--faint);padding:14px 0;border-bottom:1px solid var(--line);
+  }
+  .spec dd{padding:14px 0;border-bottom:1px solid var(--line);font-size:14px;display:flex;align-items:center}
+  .spec dt:last-of-type,.spec dd:last-of-type{border-bottom:none}
+  code.tok{
+    font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink);
+    background:var(--paper-2);border:1px solid var(--line);border-radius:7px;padding:3px 10px;
+  }
+  code.perm{color:var(--clay-deep);border-color:var(--clay-soft);background:var(--clay-soft)}
+  code.resp{color:var(--get);background:var(--get-bg);border-color:var(--get-bg)}
+
+  footer{
+    max-width:760px;margin-top:40px;padding-top:24px;border-top:1px solid var(--line);
+    font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint);
+  }
+  footer b{color:var(--muted);font-weight:500}
+
+  @media (max-width:920px){
+    .shell{grid-template-columns:1fr}
+    .side{position:relative;height:auto;border-right:none;border-bottom:1px solid var(--line);
+      flex-direction:row;flex-wrap:wrap;gap:18px 28px;align-items:center}
+    .side-foot{margin:0}
+    .nav-group{flex:1;min-width:200px}
+    main{padding:44px 26px 90px}
+    .ep-title{display:none}
+    .spec{grid-template-columns:92px 1fr}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="side">
+    <div class="brand">
+      <span class="kicker">API Reference</span>
+      <h2>{{table_comment}}</h2>
+      <span class="prefix">/{{model_kebab}}</span>
+    </div>
+
+    <nav class="nav-group">
+      <span class="nav-label">Schema</span>
+      <a class="nav-item" href="#fields"><span class="verb v-aux">DEF</span> 数据字段</a>
+    </nav>
+
+    <nav class="nav-group">
+      <span class="nav-label">Endpoints</span>
+      <a class="nav-item" href="#ep-create"><span class="verb v-post">POST</span> 新增</a>
+      <a class="nav-item" href="#ep-update"><span class="verb v-put">PUT</span> 修改</a>
+      <a class="nav-item" href="#ep-remove"><span class="verb v-del">DEL</span> 删除</a>
+      <a class="nav-item" href="#ep-list"><span class="verb v-get">GET</span> 列表查询</a>
+      <a class="nav-item" href="#ep-detail"><span class="verb v-get">GET</span> 详情</a>
+      {{#if has_import}}
+      <a class="nav-item" href="#ep-import"><span class="verb v-post">POST</span> 导入</a>
+      {{/if}}
+      {{#if has_export}}
+      <a class="nav-item" href="#ep-export"><span class="verb v-post">POST</span> 导出</a>
+      {{/if}}
+    </nav>
+
+    <div class="side-foot">
+      <span><b>Module</b> {{model_pascal}}</span>
+      <span><b>Author</b> {{user_name}}</span>
+      <span><b>Built</b> {{datetime}}</span>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main>
+
+    <!-- hero -->
+    <header class="hero reveal" style="animation-delay:.02s">
+      <div class="eyebrow">{{model_pascal}} · 接口文档</div>
+      <h1>{{table_comment}} <em>API</em></h1>
+      <p class="lede">{{model_pascal}} 模块的完整 RESTful 接口契约。所有响应统一包裹于 <code>ApiResult&lt;T&gt;</code>，分页结果包裹于 <code>PageResult&lt;T&gt;</code>。</p>
+      <div class="meta-row">
+        <span class="chip"><span class="dot"></span>路径前缀 <b>/{{model_kebab}}</b></span>
+        <span class="chip">作者 <b>{{user_name}}</b></span>
+        <span class="chip">生成 <b>{{datetime}}</b></span>
+      </div>
+    </header>
+
+    <!-- quick reference -->
+    <section class="reveal" style="animation-delay:.08s" aria-label="接口速查">
+      <div class="s-head">
+        <span class="idx">00</span>
+        <h2>速查表</h2>
+        <span class="rule"></span>
+      </div>
+      <table class="tbl">
+        <thead>
+          <tr><th style="width:96px">方法</th><th>路径</th><th>权限</th><th style="width:120px">说明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="verb v-post">POST</span></td><td><a class="path" href="#ep-create">/{{model_kebab}}</a></td><td><code>{{model_snake}}:create</code></td><td>新增</td></tr>
+          <tr><td><span class="verb v-put">PUT</span></td><td><a class="path" href="#ep-update">/{{model_kebab}}</a></td><td><code>{{model_snake}}:update</code></td><td>修改</td></tr>
+          <tr><td><span class="verb v-del">DEL</span></td><td><a class="path" href="#ep-remove">/{{model_kebab}}</a></td><td><code>{{model_snake}}:remove</code></td><td>删除</td></tr>
+          <tr><td><span class="verb v-get">GET</span></td><td><a class="path" href="#ep-list">/{{model_kebab}}</a></td><td><code>{{model_snake}}:list</code></td><td>列表查询</td></tr>
+          <tr><td><span class="verb v-get">GET</span></td><td><a class="path" href="#ep-detail">/{{model_kebab}}/{id}</a></td><td><code>{{model_snake}}:list</code></td><td>详情</td></tr>
+          {{#if has_import}}
+          <tr><td><span class="verb v-post">POST</span></td><td><a class="path" href="#ep-import">/{{model_kebab}}/import</a></td><td><code>{{model_snake}}:import</code></td><td>导入</td></tr>
+          {{/if}}
+          {{#if has_export}}
+          <tr><td><span class="verb v-post">POST</span></td><td><a class="path" href="#ep-export">/{{model_kebab}}/export</a></td><td><code>{{model_snake}}:export</code></td><td>导出</td></tr>
+          {{/if}}
+        </tbody>
+      </table>
+    </section>
+
+    <!-- fields -->
+    <section id="fields" class="reveal" style="animation-delay:.12s">
+      <div class="s-head">
+        <span class="idx">01</span>
+        <h2>数据字段</h2>
+        <span class="rule"></span>
+      </div>
+      <table class="tbl">
+        <thead>
+          <tr><th>字段</th><th>类型</th><th style="width:120px">主键</th><th style="width:130px">可空</th></tr>
+        </thead>
+        <tbody>
+          {{#each fields}}
+          <tr>
+            <td class="fname">{{name}}</td>
+            <td class="ftype">{{type}}</td>
+            <td>{{#if is_pk}}<span class="pill key">PRIMARY</span>{{else}}<span class="pill no">—</span>{{/if}}</td>
+            <td>{{#if nullable}}<span class="pill yes">NULLABLE</span>{{else}}<span class="pill no">NOT NULL</span>{{/if}}</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </section>
+
+    <!-- endpoints -->
+    <section class="reveal" style="animation-delay:.16s">
+      <div class="s-head">
+        <span class="idx">02</span>
+        <h2>接口详情</h2>
+        <span class="rule"></span>
+      </div>
+
+      <!-- create -->
+      <article class="ep" id="ep-create" style="--accent:var(--post);--accent-bg:var(--post-bg)">
+        <div class="ep-head">
+          <span class="ep-verb">POST</span>
+          <span class="ep-path">/{{model_kebab}}</span>
+          <span class="ep-title">新增</span>
+          <button class="copy" data-path="/{{model_kebab}}" aria-label="复制路径"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        </div>
+        <div class="ep-body">
+          <dl class="spec">
+            <dt>权限</dt><dd><code class="tok perm">{{model_snake}}:create</code></dd>
+            <dt>请求体</dt><dd><code class="tok">{{model_pascal}}CreateDTO</code></dd>
+            <dt>返回</dt><dd><code class="tok resp">ApiResult&lt;Void&gt;</code></dd>
+          </dl>
+        </div>
+      </article>
+
+      <!-- update -->
+      <article class="ep" id="ep-update" style="--accent:var(--put);--accent-bg:var(--put-bg)">
+        <div class="ep-head">
+          <span class="ep-verb">PUT</span>
+          <span class="ep-path">/{{model_kebab}}</span>
+          <span class="ep-title">修改</span>
+          <button class="copy" data-path="/{{model_kebab}}" aria-label="复制路径"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        </div>
+        <div class="ep-body">
+          <dl class="spec">
+            <dt>权限</dt><dd><code class="tok perm">{{model_snake}}:update</code></dd>
+            <dt>请求体</dt><dd><code class="tok">{{model_pascal}}UpdateDTO</code></dd>
+            <dt>返回</dt><dd><code class="tok resp">ApiResult&lt;Void&gt;</code></dd>
+          </dl>
+        </div>
+      </article>
+
+      <!-- remove -->
+      <article class="ep" id="ep-remove" style="--accent:var(--del);--accent-bg:var(--del-bg)">
+        <div class="ep-head">
+          <span class="ep-verb">DELETE</span>
+          <span class="ep-path">/{{model_kebab}}</span>
+          <span class="ep-title">删除</span>
+          <button class="copy" data-path="/{{model_kebab}}" aria-label="复制路径"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        </div>
+        <div class="ep-body">
+          <dl class="spec">
+            <dt>权限</dt><dd><code class="tok perm">{{model_snake}}:remove</code></dd>
+            <dt>请求体</dt><dd><code class="tok">SelectIdsDTO</code></dd>
+            <dt>返回</dt><dd><code class="tok resp">ApiResult&lt;Void&gt;</code></dd>
+          </dl>
+        </div>
+      </article>
+
+      <!-- list -->
+      <article class="ep" id="ep-list" style="--accent:var(--get);--accent-bg:var(--get-bg)">
+        <div class="ep-head">
+          <span class="ep-verb">GET</span>
+          <span class="ep-path">/{{model_kebab}}</span>
+          <span class="ep-title">列表查询</span>
+          <button class="copy" data-path="/{{model_kebab}}" aria-label="复制路径"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        </div>
+        <div class="ep-body">
+          <dl class="spec">
+            <dt>权限</dt><dd><code class="tok perm">{{model_snake}}:list</code></dd>
+            <dt>Query</dt><dd><code class="tok">{{model_pascal}}ListDTO</code></dd>
+            <dt>返回</dt><dd><code class="tok resp">ApiResult&lt;PageResult&lt;{{model_pascal}}VO&gt;&gt;</code></dd>
+          </dl>
+        </div>
+      </article>
+
+      <!-- detail -->
+      <article class="ep" id="ep-detail" style="--accent:var(--get);--accent-bg:var(--get-bg)">
+        <div class="ep-head">
+          <span class="ep-verb">GET</span>
+          <span class="ep-path">/{{model_kebab}}/<span class="param">{id}</span></span>
+          <span class="ep-title">详情</span>
+          <button class="copy" data-path="/{{model_kebab}}/{id}" aria-label="复制路径"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        </div>
+        <div class="ep-body">
+          <dl class="spec">
+            <dt>权限</dt><dd><code class="tok perm">{{model_snake}}:list</code></dd>
+            <dt>Path</dt><dd><code class="tok">id</code></dd>
+            <dt>返回</dt><dd><code class="tok resp">ApiResult&lt;{{model_pascal}}VO&gt;</code></dd>
+          </dl>
+        </div>
+      </article>
+
+      {{#if has_import}}
+      <!-- import -->
+      <article class="ep" id="ep-import" style="--accent:var(--aux);--accent-bg:var(--aux-bg)">
+        <div class="ep-head">
+          <span class="ep-verb">POST</span>
+          <span class="ep-path">/{{model_kebab}}/import</span>
+          <span class="ep-title">导入</span>
+          <button class="copy" data-path="/{{model_kebab}}/import" aria-label="复制路径"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        </div>
+        <div class="ep-body">
+          <dl class="spec">
+            <dt>权限</dt><dd><code class="tok perm">{{model_snake}}:import</code></dd>
+            <dt>Body</dt><dd><code class="tok">multipart · file</code></dd>
+            <dt>返回</dt><dd><code class="tok resp">无</code></dd>
+          </dl>
+        </div>
+      </article>
+      {{/if}}
+
+      {{#if has_export}}
+      <!-- export -->
+      <article class="ep" id="ep-export" style="--accent:var(--aux);--accent-bg:var(--aux-bg)">
+        <div class="ep-head">
+          <span class="ep-verb">POST</span>
+          <span class="ep-path">/{{model_kebab}}/export</span>
+          <span class="ep-title">导出</span>
+          <button class="copy" data-path="/{{model_kebab}}/export" aria-label="复制路径"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        </div>
+        <div class="ep-body">
+          <dl class="spec">
+            <dt>权限</dt><dd><code class="tok perm">{{model_snake}}:export</code></dd>
+            <dt>请求体</dt><dd><code class="tok">{{model_pascal}}ListDTO</code></dd>
+            <dt>返回</dt><dd><code class="tok resp">文件流 · Excel</code></dd>
+          </dl>
+        </div>
+      </article>
+      {{/if}}
+    </section>
+
+    <footer>
+      <b>{{table_comment}} API</b> · 由 crud-cli 生成 · {{datetime}} · &copy; {{year}} {{user_name}}
+    </footer>
+  </main>
+</div>
+
+<script>
+  // ---- copy path to clipboard ----
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var p = btn.getAttribute('data-path') || '';
+      var done = function(){
+        btn.classList.add('ok');
+        setTimeout(function(){ btn.classList.remove('ok'); }, 1300);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(p).then(done).catch(done);
+      } else {
+        var t = document.createElement('textarea');
+        t.value = p; document.body.appendChild(t); t.select();
+        try { document.execCommand('copy'); } catch(e){}
+        document.body.removeChild(t); done();
+      }
+    });
+  });
+
+  // ---- scroll-spy: highlight active nav item ----
+  var links = Array.prototype.slice.call(document.querySelectorAll('.nav-item'));
+  var map = {};
+  links.forEach(function(a){
+    var id = a.getAttribute('href').slice(1);
+    var el = document.getElementById(id);
+    if (el) map[id] = a;
+  });
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (e.isIntersecting){
+        links.forEach(function(l){ l.classList.remove('active'); });
+        var a = map[e.target.id];
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin:'-12% 0px -78% 0px', threshold:0 });
+  Object.keys(map).forEach(function(id){ io.observe(document.getElementById(id)); });
+</script>
+</body>
+</html>

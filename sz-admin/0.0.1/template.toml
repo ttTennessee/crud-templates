@@ -1,0 +1,5 @@
+name = "sz-admin"            # 可省略，缺省取目录名
+version = "0.0.1"         # 可省略，缺省取目录名
+backend = "java"          # 必填，小写字符串
+frontend = "vue"          # 必填
+description = "sz-admin for test"  # 可选

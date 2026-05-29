@@ -1,0 +1,119 @@
+---
+basePath: "java/{{package_path}}/controller"
+filename: "{{model_pascal}}Controller.java"
+---
+package {{package}}.{{domain}}.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+{{#if has_import}}
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+{{/if}}
+import lombok.RequiredArgsConstructor;
+import cn.dev33.satoken.annotation.SaCheckPermission;
+import org.springframework.web.bind.annotation.*;
+import com.sz.core.common.entity.ApiPageResult;
+import com.sz.core.common.entity.ApiResult;
+import com.sz.core.common.constant.GlobalConstant;
+
+import com.sz.core.common.entity.PageResult;
+import com.sz.core.common.entity.SelectIdsDTO;
+import {{package}}.{{domain}}.service.{{model_pascal}}Service;
+import {{package}}.{{domain}}.pojo.dto.{{model_pascal}}CreateDTO;
+import {{package}}.{{domain}}.pojo.dto.{{model_pascal}}UpdateDTO;
+import {{package}}.{{domain}}.pojo.dto.{{model_pascal}}ListDTO;
+import {{package}}.{{domain}}.pojo.vo.{{model_pascal}}VO;
+{{#if has_import}}
+import com.sz.core.common.entity.ImportExcelDTO;
+{{/if}}
+{{#if has_export}}
+import jakarta.servlet.http.HttpServletResponse;
+{{/if}}
+
+/**
+ * <p>
+ * {{table_comment}} Controller
+ * </p>
+ *
+ * @author {{git_user_name}}
+ * @since {{datetime}}
+ */
+@Tag(name =  "{{table_comment}}")
+@RestController
+@RequestMapping("/{{model_kebab}}")
+@RequiredArgsConstructor
+public class {{model_pascal}}Controller  {
+
+    private final {{model_pascal}}Service {{model_camel}}Service;
+
+    @Operation(summary = "新增")
+{{#if btn_permission}}
+    @SaCheckPermission(value = "{{model_snake}}:create")
+{{/if}}
+    @PostMapping
+    public ApiResult<Void> create(@RequestBody {{model_pascal}}CreateDTO dto) {
+        {{model_camel}}Service.create(dto);
+        return ApiResult.success();
+    }
+
+    @Operation(summary = "修改")
+{{#if btn_permission}}
+    @SaCheckPermission(value = "{{model_snake}}:update")
+{{/if}}
+    @PutMapping
+    public ApiResult<Void> update(@RequestBody {{model_pascal}}UpdateDTO dto) {
+        {{model_camel}}Service.update(dto);
+        return ApiResult.success();
+    }
+
+    @Operation(summary = "删除")
+{{#if btn_permission}}
+    @SaCheckPermission(value = "{{model_snake}}:remove")
+{{/if}}
+    @DeleteMapping
+    public ApiResult<Void> remove(@RequestBody SelectIdsDTO dto) {
+        {{model_camel}}Service.remove(dto);
+        return ApiResult.success();
+    }
+
+    @Operation(summary = "列表查询")
+    @SaCheckPermission(value = "{{model_snake}}:list")
+    @GetMapping
+    public ApiResult<PageResult<{{model_pascal}}VO>> list({{model_pascal}}ListDTO dto) {
+        return ApiPageResult.success({{model_camel}}Service.page(dto));
+    }
+
+    @Operation(summary = "详情")
+    @SaCheckPermission(value = "{{model_snake}}:list")
+    @GetMapping("/{id}")
+    public ApiResult<{{model_pascal}}VO> detail(@PathVariable Object id) {
+        return ApiResult.success({{model_camel}}Service.detail(id));
+    }
+{{#if has_import}}
+
+    @Operation(summary = "导入")
+    @Parameters({
+      @Parameter(name = "file", description = "上传文件", schema = @Schema(type = "string", format = "binary"), required = true),
+    })
+    {{#if btn_permission}}
+    @SaCheckPermission(value = "{{model_snake}}:import")
+    {{/if}}
+    @PostMapping("/import")
+    public void importExcel(@ModelAttribute ImportExcelDTO dto) {
+        {{model_camel}}Service.importExcel(dto);
+    }
+{{/if}}
+{{#if has_export}}
+
+    @Operation(summary = "导出")
+    {{#if btn_permission}}
+    @SaCheckPermission(value = "{{model_snake}}:export")
+    {{/if}}
+    @PostMapping("/export")
+    public void exportExcel(@RequestBody {{model_pascal}}ListDTO dto, HttpServletResponse response) {
+        {{model_camel}}Service.exportExcel(dto, response);
+    }
+{{/if}}
+}

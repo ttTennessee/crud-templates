@@ -1,0 +1,17 @@
+# Maps Java / generic DSL types to MySQL column types.
+# Used by `{{ty_map type}}` in `schema.sql.hbs` when a bundle has no local type_map.toml.
+#
+# Resolution: bundle root = first path segment (e.g. `sql/` → `db/migration/`).
+# Global fallback: `setup.toml` → `[type_map].fallback` (default: passthrough).
+
+[map]
+string = "String"
+long = "Long"
+int = "Integer"
+boolean = "Boolean"
+bool = "Boolean"
+datetime = "LocalDateTime"
+date = "LocalDate"
+decimal = "BigDecimal"
+double = "Double"
+float = "Float"

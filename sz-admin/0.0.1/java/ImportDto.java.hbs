@@ -26,7 +26,7 @@ public class {{model_pascal}}ImportDTO {
 {{#unless is_pk}}
     @ExcelProperty(value = "{{name}}")
     @Schema(description = "{{name}}")
-    private {{type}} {{name_camel}};
+    private {{ty_map type}} {{name_camel}};
 
 {{/unless}}
 {{/each}}

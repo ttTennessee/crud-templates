@@ -24,7 +24,7 @@ public class {{model_pascal}}CreateDTO {
 {{#each fields}}
 {{#unless is_pk}}
     @Schema(description = "{{name}}")
-    private {{type}} {{name_camel}};
+    private {{ty_map type}} {{name_camel}};
 
 {{/unless}}
 {{/each}}

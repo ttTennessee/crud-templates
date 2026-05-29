@@ -1,5 +1,5 @@
-name = "ruoyi"            # 可省略，缺省取目录名
-version = "0.1.1"         # 可省略，缺省取目录名
-backend = "java"          # 必填，小写字符串
-frontend = "vue"          # 必填
-description = "若依风格 Java + Vue 后台管理模板"  # 可选
+name = "test"
+version = "0.1.1"
+backend = "java"
+frontend = "vue"
+description = "若依风格 Java + Vue 后台管理模板"

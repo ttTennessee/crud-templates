@@ -1,0 +1,39 @@
+---
+basePath: "java/{{package_path}}/dto"
+filename: "{{model_pascal}}ListDTO.java"
+---
+package {{package}}.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import com.sz.core.common.entity.PageQuery;
+
+/**
+ * <p>
+ * {{table_comment}} 查询 DTO
+ * </p>
+ *
+ * @author {{user_name}}
+ * @since {{datetime}}
+ */
+@Data
+@Schema(description = "{{table_comment}}查询DTO")
+public class {{model_pascal}}ListDTO extends PageQuery {
+
+{{#each fields}}
+{{#if is_query}}
+{{#if query_between}}
+    @Schema(description = "{{comment}}起始")
+    private {{ty_map type}} {{name_camel}}Start;
+
+    @Schema(description = "{{comment}}截止")
+    private {{ty_map type}} {{name_camel}}End;
+
+{{else}}
+    @Schema(description = "{{comment}}")
+    private {{ty_map type}} {{name_camel}};
+
+{{/if}}
+{{/if}}
+{{/each}}
+}

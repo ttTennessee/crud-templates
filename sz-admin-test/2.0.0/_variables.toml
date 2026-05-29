@@ -1,0 +1,59 @@
+# ─── 表级变量 ─────────────────────────────────────────────────────────────────
+# 通过 JSON --file 的 "variables" 字段或 --var key=value 传入。
+#
+# ─── 字段级额外属性（fields[].extra）─────────────────────────────────────────
+# 以下属性不在此声明，通过 JSON fields[].extra 注入，在 {{#each fields}} 内直接使用：
+#
+#   skip_create  : bool   — true 则不出现在 CreateDTO（默认包含所有非 PK 字段）
+#   skip_update  : bool   — true 则不出现在 UpdateDTO（默认包含所有非 PK 字段）
+#   skip_list    : bool   — true 则不出现在 VO（默认包含所有字段）
+#   is_query     : bool   — true 则作为查询条件出现在 ListDTO（默认不作为查询条件）
+#   query_like   : bool   — is_query=true 时使用 LIKE（默认 EQ）
+#   query_between: bool   — is_query=true 时使用 BETWEEN，ListDTO 生成 Start/End 两个字段
+#   is_required  : bool   — true 则生成 @NotNull 校验注解
+#   is_export    : bool   — true 则在 VO 上生成 @ExcelProperty（需 has_export=true）
+#   is_import    : bool   — true 则出现在 ImportDTO（需 has_import=true）
+#   is_logic_del : bool   — true 则 PO 字段加 @Column(isLogicDelete = true)
+#   is_unique_valid: bool — true 则 create/update 中生成唯一性重复校验（需 has_unique_valid=true）
+#   dict_type    : string — 字典类型标识（非空时 ServiceImpl 查询注释体现，默认空）
+
+[table_comment]
+type = "string"
+required = true
+description = "表功能中文描述，用于 @Tag/@Schema/Javadoc 注释，例如：用户管理"
+
+[has_autofill]
+type = "bool"
+required = false
+default = true
+description = "是否挂载 EntityChangeListener 自动回填审计字段（create_by/update_time 等）"
+
+[has_import]
+type = "bool"
+required = false
+default = false
+description = "生成 Excel 导入功能（ImportDTO + ExcelImporter 文件）；false 时跳过这两个文件"
+
+[has_export]
+type = "bool"
+required = false
+default = false
+description = "生成 Excel 导出接口（Controller exportExcel + Service exportExcel 方法）"
+
+[has_permission]
+type = "bool"
+required = false
+default = true
+description = "在 Controller 各接口添加 @SaCheckPermission 权限注解"
+
+[has_data_scope]
+type = "bool"
+required = false
+default = false
+description = "在 ServiceImpl page/list 中包裹 DataScopeSession 数据权限范围"
+
+[has_unique_valid]
+type = "bool"
+required = false
+default = false
+description = "在 create/update 中为标有 is_unique_valid=true 的字段生成唯一性重复校验代码"

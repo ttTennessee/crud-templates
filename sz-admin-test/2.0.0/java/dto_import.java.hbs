@@ -1,0 +1,38 @@
+---
+basePath: "java/{{package_path}}/dto"
+filename: "{{model_pascal}}ImportDTO.java"
+generateWhen: "has_import"
+---
+package {{package}}.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import cn.idev.excel.annotation.ExcelProperty;
+import com.sz.excel.annotation.ExcelTemplate;
+import com.sz.excel.annotation.ImportColumn;
+
+/**
+ * <p>
+ * {{table_comment}} 导入 DTO
+ * </p>
+ *
+ * @author {{user_name}}
+ * @since {{datetime}}
+ */
+@Data
+@Schema(description = "{{table_comment}}导入DTO")
+@ExcelTemplate(alias = "{{table_comment}}导入模板.xlsx")
+public class {{model_pascal}}ImportDTO {
+
+{{#each fields}}
+{{#if is_import}}
+{{#if is_required}}
+    @ImportColumn(required = true)
+{{/if}}
+    @ExcelProperty(value = "{{comment}}")
+    @Schema(description = "{{comment}}")
+    private {{ty_map type}} {{name_camel}};
+
+{{/if}}
+{{/each}}
+}

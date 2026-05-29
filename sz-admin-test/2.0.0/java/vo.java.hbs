@@ -1,0 +1,40 @@
+---
+basePath: "java/{{package_path}}/vo"
+filename: "{{model_pascal}}VO.java"
+---
+package {{package}}.vo;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+{{#if has_export}}
+import cn.idev.excel.annotation.ExcelIgnore;
+import cn.idev.excel.annotation.ExcelProperty;
+{{/if}}
+
+/**
+ * <p>
+ * {{table_comment}} 返回 VO
+ * </p>
+ *
+ * @author {{user_name}}
+ * @since {{datetime}}
+ */
+@Data
+@Schema(description = "{{table_comment}}返回VO")
+public class {{model_pascal}}VO {
+
+{{#each fields}}
+{{#unless skip_list}}
+{{#if has_export}}
+{{#if is_export}}
+    @ExcelProperty(value = "{{comment}}")
+{{else}}
+    @ExcelIgnore
+{{/if}}
+{{/if}}
+    @Schema(description = "{{comment}}")
+    private {{ty_map type}} {{name_camel}};
+
+{{/unless}}
+{{/each}}
+}

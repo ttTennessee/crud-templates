@@ -1,0 +1,182 @@
+---
+basePath: "java/{{package_path}}/service/impl"
+filename: "{{model_pascal}}ServiceImpl.java"
+---
+package {{package}}.service.impl;
+
+import com.mybatisflex.spring.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import {{package}}.service.I{{model_pascal}}Service;
+import {{package}}.po.{{model_pascal}};
+import {{package}}.mapper.{{model_pascal}}Mapper;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.core.query.QueryChain;
+import com.sz.core.common.enums.CommonResponseEnum;
+import com.sz.core.util.PageUtils;
+import com.sz.core.util.BeanCopyUtils;
+import com.sz.core.util.Utils;
+import com.sz.core.common.entity.PageResult;
+import com.sz.core.common.entity.SelectIdsDTO;
+import java.io.Serializable;
+import java.util.List;
+import {{package}}.dto.{{model_pascal}}CreateDTO;
+import {{package}}.dto.{{model_pascal}}UpdateDTO;
+import {{package}}.dto.{{model_pascal}}ListDTO;
+import {{package}}.vo.{{model_pascal}}VO;
+{{#if has_import}}
+import {{package}}.excel.{{model_pascal}}ExcelImporter;
+import com.sz.core.common.entity.ImportExcelDTO;
+import com.sz.excel.imports.model.ExcelImportResultVO;
+{{/if}}
+{{#if has_export}}
+import java.io.OutputStream;
+import jakarta.servlet.http.HttpServletResponse;
+import com.sz.core.util.FileUtils;
+import com.sz.excel.utils.ExcelUtils;
+{{/if}}
+{{#if has_data_scope}}
+import com.sz.core.datascope.DataScopeSession;
+{{/if}}
+
+/**
+ * <p>
+ * {{table_comment}} 服务实现类
+ * </p>
+ *
+ * @author {{user_name}}
+ * @since {{datetime}}
+ */
+@Service
+@RequiredArgsConstructor
+public class {{model_pascal}}ServiceImpl extends ServiceImpl<{{model_pascal}}Mapper, {{model_pascal}}> implements I{{model_pascal}}Service {
+{{#if has_import}}
+
+    private final {{model_pascal}}ExcelImporter excelImporter;
+{{/if}}
+
+    @Override
+    public void create({{model_pascal}}CreateDTO dto) {
+        {{model_pascal}} {{model_camel}} = BeanCopyUtils.copy(dto, {{model_pascal}}.class);
+{{#if has_unique_valid}}
+        long count;
+{{#each fields}}
+{{#if is_unique_valid}}
+        count = QueryChain.of({{../model_pascal}}.class).eq({{../model_pascal}}::get{{name_pascal}}, dto.get{{name_pascal}}()).count();
+        CommonResponseEnum.EXISTS.message("{{comment}}已存在").assertTrue(count > 0);
+{{/if}}
+{{/each}}
+{{/if}}
+        save({{model_camel}});
+    }
+
+    @Override
+    public void update({{model_pascal}}UpdateDTO dto) {
+        {{model_pascal}} {{model_camel}} = BeanCopyUtils.copy(dto, {{model_pascal}}.class);
+{{#each fields}}
+{{#if is_pk}}
+        CommonResponseEnum.INVALID_ID.assertNull(getById((Serializable) dto.get{{name_pascal}}()));
+{{/if}}
+{{/each}}
+{{#if has_unique_valid}}
+        long count;
+{{#each fields}}
+{{#if is_unique_valid}}
+        count = QueryChain.of({{../model_pascal}}.class)
+                .eq({{../model_pascal}}::get{{name_pascal}}, dto.get{{name_pascal}}())
+{{#each ../fields}}
+{{#if is_pk}}
+                .ne({{../../model_pascal}}::get{{name_pascal}}, dto.get{{name_pascal}}())
+{{/if}}
+{{/each}}
+                .count();
+        CommonResponseEnum.EXISTS.message("{{comment}}已存在").assertTrue(count > 0);
+{{/if}}
+{{/each}}
+{{/if}}
+        saveOrUpdate({{model_camel}});
+    }
+
+    @Override
+    public PageResult<{{model_pascal}}VO> page({{model_pascal}}ListDTO dto) {
+{{#if has_data_scope}}
+        try (var ignored = new DataScopeSession({{model_pascal}}.class)) {
+            Page<{{model_pascal}}VO> page = pageAs(PageUtils.getPage(dto), buildQueryWrapper(dto), {{model_pascal}}VO.class);
+            return PageUtils.getPageResult(page);
+        }
+{{else}}
+        Page<{{model_pascal}}VO> page = pageAs(PageUtils.getPage(dto), buildQueryWrapper(dto), {{model_pascal}}VO.class);
+        return PageUtils.getPageResult(page);
+{{/if}}
+    }
+
+    @Override
+    public List<{{model_pascal}}VO> list({{model_pascal}}ListDTO dto) {
+{{#if has_data_scope}}
+        try (var ignored = new DataScopeSession({{model_pascal}}.class)) {
+            return listAs(buildQueryWrapper(dto), {{model_pascal}}VO.class);
+        }
+{{else}}
+        return listAs(buildQueryWrapper(dto), {{model_pascal}}VO.class);
+{{/if}}
+    }
+
+    @Override
+    public void remove(SelectIdsDTO dto) {
+        CommonResponseEnum.INVALID_ID.assertTrue(dto.getIds().isEmpty());
+        removeByIds(dto.getIds());
+    }
+
+    @Override
+    public {{model_pascal}}VO detail(Object id) {
+        {{model_pascal}} {{model_camel}} = getById((Serializable) id);
+        CommonResponseEnum.INVALID_ID.assertNull({{model_camel}});
+        return BeanCopyUtils.copy({{model_camel}}, {{model_pascal}}VO.class);
+    }
+{{#if has_import}}
+
+    @Override
+    public ExcelImportResultVO importExcel(ImportExcelDTO dto) {
+        return excelImporter.importExcel(dto);
+    }
+{{/if}}
+{{#if has_export}}
+
+    @Override
+    public void exportExcel({{model_pascal}}ListDTO dto, HttpServletResponse response) {
+        List<{{model_pascal}}VO> list = list(dto);
+        String fileName = "{{table_comment}}";
+        try {
+            OutputStream os = FileUtils.getOutputStream(response, fileName + ".xlsx");
+            ExcelUtils.exportExcel(list, "{{table_comment}}", {{model_pascal}}VO.class, os, true);
+        } catch (Exception e) {
+            throw new RuntimeException("导出失败", e);
+        }
+    }
+{{/if}}
+
+    private static QueryWrapper buildQueryWrapper({{model_pascal}}ListDTO dto) {
+        QueryWrapper wrapper = QueryWrapper.create().from({{model_pascal}}.class);
+{{#each fields}}
+{{#if is_query}}
+{{#if query_between}}
+        if (Utils.isNotNull(dto.get{{name_pascal}}Start()) && Utils.isNotNull(dto.get{{name_pascal}}End())) {
+            wrapper.between({{../model_pascal}}::get{{name_pascal}}, dto.get{{name_pascal}}Start(), dto.get{{name_pascal}}End());
+        }
+{{else}}
+{{#if query_like}}
+        if (Utils.isNotNull(dto.get{{name_pascal}}())) {
+            wrapper.like({{../model_pascal}}::get{{name_pascal}}, dto.get{{name_pascal}}());
+        }
+{{else}}
+        if (Utils.isNotNull(dto.get{{name_pascal}}())) {
+            wrapper.eq({{../model_pascal}}::get{{name_pascal}}, dto.get{{name_pascal}}());
+        }
+{{/if}}
+{{/if}}
+{{/if}}
+{{/each}}
+        return wrapper;
+    }
+}

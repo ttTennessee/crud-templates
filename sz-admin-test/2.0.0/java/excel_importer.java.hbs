@@ -1,0 +1,93 @@
+---
+basePath: "java/{{package_path}}/excel"
+filename: "{{model_pascal}}ExcelImporter.java"
+generateWhen: "has_import"
+---
+package {{package}}.excel;
+
+import com.sz.admin.system.service.SysImportBatchService;
+import com.sz.admin.system.service.SysImportFailRecordService;
+import {{package}}.mapper.{{model_pascal}}Mapper;
+import {{package}}.dto.{{model_pascal}}ImportDTO;
+import {{package}}.po.{{model_pascal}};
+import com.sz.core.common.entity.ImportExcelDTO;
+import com.sz.core.util.BeanCopyUtils;
+import com.sz.excel.core.ExcelFailRow;
+import com.sz.excel.imports.model.ExcelImportBizResult;
+import com.sz.excel.imports.model.ExcelImportFailItem;
+import com.sz.excel.imports.model.ExcelImportResultVO;
+import com.sz.excel.imports.template.AbstractExcelImportTemplate;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * <p>
+ * {{table_comment}} Excel 导入实现
+ * </p>
+ *
+ * @author {{user_name}}
+ * @since {{datetime}}
+ */
+@Component
+public class {{model_pascal}}ExcelImporter extends AbstractExcelImportTemplate<{{model_pascal}}ImportDTO> {
+
+    private final {{model_pascal}}Mapper mapper;
+
+    public {{model_pascal}}ExcelImporter({{model_pascal}}Mapper mapper,
+            SysImportBatchService sysImportBatchService,
+            SysImportFailRecordService sysImportFailRecordService) {
+        super(sysImportBatchService, sysImportFailRecordService);
+        this.mapper = mapper;
+    }
+
+    public ExcelImportResultVO importExcel(ImportExcelDTO dto) {
+        return execute(dto);
+    }
+
+    @Override
+    protected Class<{{model_pascal}}ImportDTO> importDtoClass() {
+        return {{model_pascal}}ImportDTO.class;
+    }
+
+    @Override
+    protected String bizType() {
+        return "{{table}}";
+    }
+
+    @Override
+    protected String bizName() {
+        return "{{table_comment}}导入";
+    }
+
+    @Override
+    protected ExcelImportBizResult doImport(String batchId, List<{{model_pascal}}ImportDTO> rows) {
+        if (rows == null || rows.isEmpty()) {
+            return ExcelImportBizResult.empty();
+        }
+        List<{{model_pascal}}> successList = new ArrayList<>();
+        List<ExcelImportFailItem> failDetails = new ArrayList<>();
+        for ({{model_pascal}}ImportDTO dto : rows) {
+            {{model_pascal}} po = BeanCopyUtils.copy(dto, {{model_pascal}}.class);
+            successList.add(po);
+        }
+        mapper.insertBatch(successList);
+        return ExcelImportBizResult.of(successList.size(), failDetails);
+    }
+
+    @Override
+    protected List<ExcelImportFailItem> convertExcelFailItems(
+            List<ExcelFailRow<{{model_pascal}}ImportDTO>> failRows) {
+        if (failRows == null || failRows.isEmpty()) {
+            return new ArrayList<>();
+        }
+{{#each fields}}
+{{#if is_pk}}
+        return failRows.stream()
+                .map(row -> buildExcelFailItem(row, {{../model_pascal}}ImportDTO::get{{name_pascal}}, "{{comment}}"))
+                .toList();
+{{/if}}
+{{/each}}
+    }
+}

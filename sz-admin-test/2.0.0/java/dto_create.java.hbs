@@ -1,0 +1,39 @@
+---
+basePath: "java/{{package_path}}/dto"
+filename: "{{model_pascal}}CreateDTO.java"
+---
+package {{package}}.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+/**
+ * <p>
+ * {{table_comment}} 新增 DTO
+ * </p>
+ *
+ * @author {{user_name}}
+ * @since {{datetime}}
+ */
+@Data
+@Schema(description = "{{table_comment}}新增DTO")
+public class {{model_pascal}}CreateDTO {
+
+{{#each fields}}
+{{#unless is_pk}}
+{{#unless skip_create}}
+{{#if is_required}}
+    @NotNull(message = "{{comment}}不能为空")
+{{/if}}
+{{#if length}}
+    @Size(max = {{length}}, message = "{{comment}}长度不能超过{{length}}个字符")
+{{/if}}
+    @Schema(description = "{{comment}}")
+    private {{ty_map type}} {{name_camel}};
+
+{{/unless}}
+{{/unless}}
+{{/each}}
+}

@@ -1,0 +1,52 @@
+---
+basePath: "java/{{package_path}}/po"
+filename: "{{model_pascal}}.java"
+---
+package {{package}}.po;
+
+import com.mybatisflex.annotation.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.experimental.Accessors;
+import java.io.Serializable;
+import java.io.Serial;
+import com.sz.db.EntityChangeListener;
+import com.sz.db.id.SzIdGenerator;
+
+/**
+ * <p>
+ * {{table_comment}}
+ * </p>
+ *
+ * @author {{user_name}}
+ * @since {{datetime}}
+ */
+@Data
+@Accessors(chain = true)
+{{#if has_autofill}}
+@Table(value = "{{table}}", onInsert = EntityChangeListener.class, onUpdate = EntityChangeListener.class)
+{{else}}
+@Table(value = "{{table}}")
+{{/if}}
+@Schema(description = "{{table_comment}}")
+public class {{model_pascal}} implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+{{#each fields}}
+{{#if is_pk}}
+{{#if auto_increment}}
+    @Id(keyType = KeyType.Auto)
+{{else}}
+    @Id(keyType = KeyType.Generator, value = SzIdGenerator.NAME)
+{{/if}}
+{{/if}}
+{{#if is_logic_del}}
+    @Column(isLogicDelete = true)
+{{/if}}
+    @Schema(description = "{{comment}}")
+    private {{ty_map type}} {{name_camel}};
+
+{{/each}}
+}

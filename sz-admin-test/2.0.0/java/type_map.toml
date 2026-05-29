@@ -1,0 +1,38 @@
+[map]
+# 字符串
+string  = "String"
+text    = "String"
+varchar = "String"
+char    = "String"
+
+# 整数
+int       = "Integer"
+integer   = "Integer"
+long      = "Long"
+short     = "Short"
+byte      = "Byte"
+tinyint   = "Integer"
+smallint  = "Integer"
+bigint    = "Long"
+
+# 浮点/精度
+float      = "Float"
+double     = "Double"
+decimal    = "BigDecimal"
+bigdecimal = "BigDecimal"
+numeric    = "BigDecimal"
+
+# 布尔
+boolean = "Boolean"
+bool    = "Boolean"
+bit     = "Boolean"
+
+# 日期时间
+datetime  = "LocalDateTime"
+timestamp = "LocalDateTime"
+date      = "LocalDate"
+time      = "LocalTime"
+
+# 二进制/JSON
+blob = "byte[]"
+json = "String"

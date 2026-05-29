@@ -1,0 +1,53 @@
+---
+basePath: "java/{{package_path}}/service"
+filename: "I{{model_pascal}}Service.java"
+---
+package {{package}}.service;
+
+import com.mybatisflex.core.service.IService;
+import {{package}}.po.{{model_pascal}};
+import {{package}}.dto.{{model_pascal}}CreateDTO;
+import {{package}}.dto.{{model_pascal}}UpdateDTO;
+import {{package}}.dto.{{model_pascal}}ListDTO;
+import {{package}}.vo.{{model_pascal}}VO;
+import com.sz.core.common.entity.SelectIdsDTO;
+import com.sz.core.common.entity.PageResult;
+import java.util.List;
+{{#if has_import}}
+import com.sz.core.common.entity.ImportExcelDTO;
+import com.sz.excel.imports.model.ExcelImportResultVO;
+{{/if}}
+{{#if has_export}}
+import jakarta.servlet.http.HttpServletResponse;
+{{/if}}
+
+/**
+ * <p>
+ * {{table_comment}} Service 接口
+ * </p>
+ *
+ * @author {{user_name}}
+ * @since {{datetime}}
+ */
+public interface I{{model_pascal}}Service extends IService<{{model_pascal}}> {
+
+    void create({{model_pascal}}CreateDTO dto);
+
+    void update({{model_pascal}}UpdateDTO dto);
+
+    PageResult<{{model_pascal}}VO> page({{model_pascal}}ListDTO dto);
+
+    List<{{model_pascal}}VO> list({{model_pascal}}ListDTO dto);
+
+    void remove(SelectIdsDTO dto);
+
+    {{model_pascal}}VO detail(Object id);
+{{#if has_import}}
+
+    ExcelImportResultVO importExcel(ImportExcelDTO dto);
+{{/if}}
+{{#if has_export}}
+
+    void exportExcel({{model_pascal}}ListDTO dto, HttpServletResponse response);
+{{/if}}
+}

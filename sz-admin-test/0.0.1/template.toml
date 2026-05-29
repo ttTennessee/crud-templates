@@ -1,0 +1,11 @@
+name        = "sz-admin"
+version     = "0.0.1"
+backend     = "java"
+frontend    = "vue"
+description = "sz-admin for test"
+
+[paths.lang]
+java = "src/main/java"
+
+[paths.aux]
+resources = "src/main/resources"

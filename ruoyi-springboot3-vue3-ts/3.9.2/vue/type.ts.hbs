@@ -1,0 +1,23 @@
+---
+basePath: "vue/types/api/{{module_name}}"
+filename: "{{model_camel}}.ts"
+---
+import type { PageDomain, BaseEntity } from '../common'
+
+/** {{function_name}}查询参数 */
+export interface {{model_pascal}}QueryParams extends PageDomain {
+{{#each fields}}
+{{#if query}}
+  /** {{comment}} */
+  {{name_camel}}?: {{#if ts_type}}{{ts_type}}{{else}}string{{/if}}
+{{/if}}
+{{/each}}
+}
+
+/** {{function_name}}信息 */
+export interface {{model_pascal}} extends BaseEntity {
+{{#each fields}}
+  /** {{comment}} */
+  {{name_camel}}?: {{#if ts_type}}{{ts_type}}{{else}}string{{/if}}
+{{/each}}
+}

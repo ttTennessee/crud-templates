@@ -1,0 +1,49 @@
+---
+basePath: "vue/api/{{module_name}}"
+filename: "{{model_camel}}.ts"
+---
+import request from '@/utils/request'
+import type { AjaxResult, {{#unless is_tree}}TableDataInfo, {{/unless}}{{model_pascal}}QueryParams, {{model_pascal}} } from '@/types'
+
+// 查询{{function_name}}列表
+export function list{{model_pascal}}(query{{#if is_tree}}?{{/if}}: {{model_pascal}}QueryParams): Promise<{{#if is_tree}}AjaxResult<{{model_pascal}}[]>{{else}}TableDataInfo<{{model_pascal}}[]>{{/if}}> {
+  return request({
+    url: '/{{module_name}}/{{model_camel}}/list',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询{{function_name}}详细
+export function get{{model_pascal}}({{pk_field}}: number): Promise<AjaxResult<{{model_pascal}}>> {
+  return request({
+    url: '/{{module_name}}/{{model_camel}}/' + {{pk_field}},
+    method: 'get'
+  })
+}
+
+// 新增{{function_name}}
+export function add{{model_pascal}}(data: {{model_pascal}}): Promise<AjaxResult> {
+  return request({
+    url: '/{{module_name}}/{{model_camel}}',
+    method: 'post',
+    data: data
+  })
+}
+
+// 修改{{function_name}}
+export function update{{model_pascal}}(data: {{model_pascal}}): Promise<AjaxResult> {
+  return request({
+    url: '/{{module_name}}/{{model_camel}}',
+    method: 'put',
+    data: data
+  })
+}
+
+// 删除{{function_name}}
+export function del{{model_pascal}}({{pk_field}}: number | number[]): Promise<AjaxResult> {
+  return request({
+    url: '/{{module_name}}/{{model_camel}}/' + {{pk_field}},
+    method: 'delete'
+  })
+}

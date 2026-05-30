@@ -1,0 +1,9 @@
+---
+basePath: "vue/types/api/{{module_name}}"
+filename: "_export-hint.ts"
+overwrite: always
+---
+{{!-- 此文件为提示文件，请手动将下方 export 追加到 types/api/index.ts 后删除本文件 --}}
+
+// {{module_name}} 模块 - {{function_name}}
+export * from './{{model_camel}}'

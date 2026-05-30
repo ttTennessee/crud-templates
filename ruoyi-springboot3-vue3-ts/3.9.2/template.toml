@@ -1,0 +1,13 @@
+name = "RuoYi-Vue-Springboot4"
+version = "3.9.2"
+backend = "java"
+frontend = "vue"
+description = "RuoYi-Vue@3.9.2 for Springboot 4.x"
+
+
+[paths.lang]
+java = "ruoyi-admin/src/main/java"
+vue = "ruoyi-ui/src"
+
+[paths.aux]
+resources = "ruoyi-admin/src/main/resources"

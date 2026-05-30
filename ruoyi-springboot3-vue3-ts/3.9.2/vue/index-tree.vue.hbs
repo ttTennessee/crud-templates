@@ -1,0 +1,413 @@
+---
+basePath: "vue/views/{{module_name}}/{{model_camel}}"
+filename: "index.vue"
+---
+{{!--
+  树形表模板。
+  额外需要在 _variables.toml 或 --var 中传入：
+    tree_code        树节点 ID 字段（camelCase），如 deptId
+    tree_parent_code 父节点字段（camelCase），如 parentId
+    tree_name        节点显示名称字段（camelCase），如 deptName
+  以上变量在本模板中使用，需在 _variables.toml 或调用时补充声明。
+--}}
+<template>
+  <div class="app-container">
+    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
+{{#each fields}}
+{{#if query}}
+{{#if is_input}}
+      <el-form-item label="{{comment}}" prop="{{name_camel}}">
+        <el-input
+          v-model="queryParams.{{name_camel}}"
+          placeholder="请输入{{comment}}"
+          clearable
+          @keyup.enter="handleQuery"
+        />
+      </el-form-item>
+{{/if}}
+{{#if is_select}}
+      <el-form-item label="{{comment}}" prop="{{name_camel}}">
+        <el-select v-model="queryParams.{{name_camel}}" placeholder="请选择{{comment}}" clearable>
+          {{#if dict_type}}
+          <el-option v-for="dict in {{dict_type}}" :key="dict.value" :label="dict.label" :value="dict.value" />
+          {{else}}
+          <el-option label="请选择字典生成" value="" />
+          {{/if}}
+        </el-select>
+      </el-form-item>
+{{/if}}
+{{#if is_datetime}}
+{{#unless query_between}}
+      <el-form-item label="{{comment}}" prop="{{name_camel}}">
+        <el-date-picker clearable
+          v-model="queryParams.{{name_camel}}"
+          type="date"
+          value-format="YYYY-MM-DD"
+          placeholder="请选择{{comment}}"
+        />
+      </el-form-item>
+{{/unless}}
+{{#if query_between}}
+      <el-form-item label="{{comment}}" style="width: 308px">
+        <el-date-picker
+          v-model="daterange{{name_pascal}}"
+          value-format="YYYY-MM-DD"
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        />
+      </el-form-item>
+{{/if}}
+{{/if}}
+{{/if}}
+{{/each}}
+      <el-form-item>
+        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
+      </el-form-item>
+    </el-form>
+
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['{{permission_prefix}}:add']">新增</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button type="info" plain icon="Sort" @click="toggleExpandAll">展开/折叠</el-button>
+      </el-col>
+      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" />
+    </el-row>
+
+    <el-table
+      v-if="refreshTable"
+      v-loading="loading"
+      :data="{{model_camel}}List"
+      row-key="{{tree_code}}"
+      :default-expand-all="isExpandAll"
+      :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+    >
+{{#each fields}}
+{{#unless is_pk}}
+{{#if list}}
+{{#if is_datetime}}
+      <el-table-column label="{{comment}}" align="center" prop="{{name_camel}}" width="180">
+        <template #default="scope">
+          <span>{{ parseTime(scope.row.{{name_camel}}, '{y}-{m}-{d}') }}</span>
+        </template>
+      </el-table-column>
+{{/if}}
+{{#if is_image}}
+      <el-table-column label="{{comment}}" align="center" prop="{{name_camel}}" width="100">
+        <template #default="scope">
+          <image-preview :src="scope.row.{{name_camel}}" :width="50" :height="50" />
+        </template>
+      </el-table-column>
+{{/if}}
+{{#unless is_datetime}}
+{{#unless is_image}}
+{{#if dict_type}}
+      <el-table-column label="{{comment}}" align="center" prop="{{name_camel}}">
+        <template #default="scope">
+{{#if is_checkbox}}
+          <dict-tag :options="{{dict_type}}" :value="scope.row.{{name_camel}} ? scope.row.{{name_camel}}.split(',') : []" />
+{{else}}
+          <dict-tag :options="{{dict_type}}" :value="scope.row.{{name_camel}}" />
+{{/if}}
+        </template>
+      </el-table-column>
+{{else}}
+      <el-table-column label="{{comment}}" prop="{{name_camel}}" />
+{{/if}}
+{{/unless}}
+{{/unless}}
+{{/if}}
+{{/unless}}
+{{/each}}
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+        <template #default="scope">
+          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['{{permission_prefix}}:edit']">修改</el-button>
+          <el-button link type="primary" icon="Plus" @click="handleAdd(scope.row)" v-hasPermi="['{{permission_prefix}}:add']">新增</el-button>
+          <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['{{permission_prefix}}:remove']">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!-- 添加或修改{{function_name}}对话框 -->
+    <el-dialog :title="title" v-model="open" width="500px" append-to-body>
+      <el-form ref="{{model_camel}}Ref" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="上级节点" prop="{{tree_parent_code}}">
+          <el-tree-select
+            v-model="form.{{tree_parent_code}}"
+            :data="{{model_camel}}Options"
+            :props="{ value: '{{tree_code}}', label: '{{tree_name}}', children: 'children' }"
+            value-key="{{tree_code}}"
+            placeholder="请选择上级节点"
+            check-strictly
+          />
+        </el-form-item>
+{{#each fields}}
+{{#if insert}}
+{{#unless is_pk}}
+{{#if is_input}}
+        <el-form-item label="{{comment}}" prop="{{name_camel}}">
+          <el-input v-model="form.{{name_camel}}" placeholder="请输入{{comment}}" />
+        </el-form-item>
+{{/if}}
+{{#if is_textarea}}
+        <el-form-item label="{{comment}}" prop="{{name_camel}}">
+          <el-input v-model="form.{{name_camel}}" type="textarea" placeholder="请输入内容" />
+        </el-form-item>
+{{/if}}
+{{#if is_image}}
+        <el-form-item label="{{comment}}" prop="{{name_camel}}">
+          <image-upload v-model="form.{{name_camel}}" />
+        </el-form-item>
+{{/if}}
+{{#if is_file}}
+        <el-form-item label="{{comment}}" prop="{{name_camel}}">
+          <file-upload v-model="form.{{name_camel}}" />
+        </el-form-item>
+{{/if}}
+{{#if is_editor}}
+        <el-form-item label="{{comment}}">
+          <editor v-model="form.{{name_camel}}" :min-height="192" />
+        </el-form-item>
+{{/if}}
+{{#if is_select}}
+        <el-form-item label="{{comment}}" prop="{{name_camel}}">
+          <el-select v-model="form.{{name_camel}}" placeholder="请选择{{comment}}">
+            {{#if dict_type}}
+            <el-option v-for="dict in {{dict_type}}" :key="dict.value" :label="dict.label" :value="dict.value" />
+            {{else}}
+            <el-option label="请选择字典生成" value="" />
+            {{/if}}
+          </el-select>
+        </el-form-item>
+{{/if}}
+{{#if is_radio}}
+        <el-form-item label="{{comment}}" prop="{{name_camel}}">
+          <el-radio-group v-model="form.{{name_camel}}">
+            {{#if dict_type}}
+            <el-radio v-for="dict in {{dict_type}}" :key="dict.value" :label="dict.value">{{dict.label}}</el-radio>
+            {{else}}
+            <el-radio label="1">请选择字典生成</el-radio>
+            {{/if}}
+          </el-radio-group>
+        </el-form-item>
+{{/if}}
+{{#if is_checkbox}}
+        <el-form-item label="{{comment}}" prop="{{name_camel}}">
+          <el-checkbox-group v-model="form.{{name_camel}}">
+            {{#if dict_type}}
+            <el-checkbox v-for="dict in {{dict_type}}" :key="dict.value" :label="dict.value">{{dict.label}}</el-checkbox>
+            {{else}}
+            <el-checkbox>请选择字典生成</el-checkbox>
+            {{/if}}
+          </el-checkbox-group>
+        </el-form-item>
+{{/if}}
+{{#if is_datetime}}
+        <el-form-item label="{{comment}}" prop="{{name_camel}}">
+          <el-date-picker clearable
+            v-model="form.{{name_camel}}"
+            type="date"
+            value-format="YYYY-MM-DD"
+            placeholder="请选择{{comment}}"
+          />
+        </el-form-item>
+{{/if}}
+{{/unless}}
+{{/if}}
+{{/each}}
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="submitForm">确 定</el-button>
+          <el-button @click="cancel">取 消</el-button>
+        </div>
+      </template>
+    </el-dialog>
+  </div>
+</template>
+
+<script setup lang="ts" name="{{model_pascal}}">
+import type { {{model_pascal}}, {{model_pascal}}QueryParams } from '@/types/api/{{module_name}}/{{model_camel}}'
+import { list{{model_pascal}}, get{{model_pascal}}, del{{model_pascal}}, add{{model_pascal}}, update{{model_pascal}} } from '@/api/{{module_name}}/{{model_camel}}'
+
+const { proxy } = getCurrentInstance()!
+
+const {{model_camel}}List = ref<any[]>([])
+const {{model_camel}}Options = ref<any[]>([])
+const open = ref<boolean>(false)
+const loading = ref<boolean>(true)
+const showSearch = ref<boolean>(true)
+const title = ref<string>('')
+const isExpandAll = ref<boolean>(true)
+const refreshTable = ref<boolean>(true)
+{{#each fields}}
+{{#if is_datetime}}
+{{#if query_between}}
+const daterange{{name_pascal}} = ref<string[]>([])
+{{/if}}
+{{/if}}
+{{/each}}
+
+const data = reactive({
+  form: {} as {{model_pascal}},
+  queryParams: {
+{{#each fields}}
+{{#if query}}
+    {{name_camel}}: undefined,
+{{/if}}
+{{/each}}
+  } as {{model_pascal}}QueryParams,
+  rules: {
+{{#each fields}}
+{{#if required}}
+{{#unless is_pk}}
+{{#if is_select}}
+    {{name_camel}}: [{ required: true, message: '{{comment}}不能为空', trigger: 'change' }],
+{{else}}
+{{#if is_radio}}
+    {{name_camel}}: [{ required: true, message: '{{comment}}不能为空', trigger: 'change' }],
+{{else}}
+{{#if is_checkbox}}
+    {{name_camel}}: [{ required: true, message: '{{comment}}不能为空', trigger: 'change' }],
+{{else}}
+    {{name_camel}}: [{ required: true, message: '{{comment}}不能为空', trigger: 'blur' }],
+{{/if}}
+{{/if}}
+{{/if}}
+{{/unless}}
+{{/if}}
+{{/each}}
+  } as Record<string, any>
+})
+
+const { queryParams, form, rules } = toRefs(data)
+
+function getList() {
+  loading.value = true
+{{#each fields}}
+{{#if is_datetime}}
+{{#if query_between}}
+  queryParams.value.params = queryParams.value.params ?? {}
+  if (daterange{{name_pascal}}.value?.length === 2) {
+    queryParams.value.params['begin{{name_pascal}}'] = daterange{{name_pascal}}.value[0]
+    queryParams.value.params['end{{name_pascal}}'] = daterange{{name_pascal}}.value[1]
+  }
+{{/if}}
+{{/if}}
+{{/each}}
+  list{{model_pascal}}(queryParams.value).then(response => {
+    {{model_camel}}List.value = proxy!.handleTree(response.data, '{{tree_code}}', '{{tree_parent_code}}')
+    loading.value = false
+  })
+}
+
+function getTreeselect() {
+  list{{model_pascal}}().then(response => {
+    {{model_camel}}Options.value = []
+    const root: any = { {{tree_code}}: 0, {{tree_name}}: '顶级节点', children: [] }
+    root.children = proxy!.handleTree(response.data, '{{tree_code}}', '{{tree_parent_code}}')
+    {{model_camel}}Options.value.push(root)
+  })
+}
+
+function cancel() {
+  open.value = false
+  reset()
+}
+
+function reset() {
+  form.value = {} as {{model_pascal}}
+  proxy!.resetForm('{{model_camel}}Ref')
+}
+
+function handleQuery() {
+  getList()
+}
+
+function resetQuery() {
+{{#each fields}}
+{{#if is_datetime}}
+{{#if query_between}}
+  daterange{{name_pascal}}.value = []
+{{/if}}
+{{/if}}
+{{/each}}
+  proxy!.resetForm('queryRef')
+  handleQuery()
+}
+
+function handleAdd(row?: {{model_pascal}}) {
+  reset()
+  getTreeselect()
+  form.value.{{tree_parent_code}} = row?.{{tree_code}} ?? 0
+  open.value = true
+  title.value = '添加{{function_name}}'
+}
+
+function toggleExpandAll() {
+  refreshTable.value = false
+  isExpandAll.value = !isExpandAll.value
+  nextTick(() => {
+    refreshTable.value = true
+  })
+}
+
+async function handleUpdate(row: {{model_pascal}}) {
+  reset()
+  await getTreeselect()
+  get{{model_pascal}}(row.{{pk_field}} as number).then(response => {
+    form.value = response.data
+{{#each fields}}
+{{#if is_checkbox}}
+    if (form.value.{{name_camel}}) {
+      form.value.{{name_camel}} = (form.value.{{name_camel}} as unknown as string).split(',') as any
+    }
+{{/if}}
+{{/each}}
+    open.value = true
+    title.value = '修改{{function_name}}'
+  })
+}
+
+function submitForm() {
+  proxy!.$refs['{{model_camel}}Ref'].validate((valid: boolean) => {
+    if (valid) {
+{{#each fields}}
+{{#if is_checkbox}}
+      if (Array.isArray(form.value.{{name_camel}})) {
+        form.value.{{name_camel}} = (form.value.{{name_camel}} as unknown as string[]).join(',') as any
+      }
+{{/if}}
+{{/each}}
+      if (form.value.{{pk_field}} != null) {
+        update{{model_pascal}}(form.value).then(() => {
+          proxy!.$modal.msgSuccess('修改成功')
+          open.value = false
+          getList()
+        })
+      } else {
+        add{{model_pascal}}(form.value).then(() => {
+          proxy!.$modal.msgSuccess('新增成功')
+          open.value = false
+          getList()
+        })
+      }
+    }
+  })
+}
+
+function handleDelete(row: {{model_pascal}}) {
+  proxy!.$modal.confirm('是否确认删除{{function_name}}"' + row.{{tree_name}} + '"的数据项？').then(() => {
+    return del{{model_pascal}}(row.{{pk_field}} as number)
+  }).then(() => {
+    getList()
+    proxy!.$modal.msgSuccess('删除成功')
+  }).catch(() => {})
+}
+
+getList()
+</script>

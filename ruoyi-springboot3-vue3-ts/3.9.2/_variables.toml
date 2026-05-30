@@ -1,0 +1,58 @@
+# 每次调用时需声明的变量（内置变量不在此列）
+# 字段级 extra 属性（在 JSON fields 数组中声明，不在此处）：
+#   query (bool)         是否出现在搜索表单
+#   list  (bool)         是否出现在列表列
+#   insert (bool)        是否出现在新增/编辑表单
+#   required (bool)      是否必填
+#   dict_type (string)   字典类型 key，空串表示无字典
+#   is_input / is_select / is_radio / is_checkbox
+#   is_datetime / is_textarea / is_image / is_file / is_editor  (bool)
+#   query_between (bool) datetime 字段是否使用 BETWEEN 范围查询
+#   ts_type (string)     TypeScript 类型，如 string | number | boolean
+
+[module_name]
+type = "string"
+required = true
+description = "模块名称（路由/API 前缀），如 system、monitor、tool"
+
+[function_name]
+type = "string"
+required = true
+description = "功能名称（中文），用于标题和操作提示，如 用户管理"
+
+[permission_prefix]
+type = "string"
+required = true
+description = "权限前缀，如 system:user，生成 v-hasPermi 指令"
+
+[pk_field]
+type = "string"
+required = false
+default = "id"
+description = "主键字段名（camelCase），默认 id"
+
+[is_tree]
+type = "boolean"
+required = false
+default = false
+description = "是否树形表。true 时 list 接口返回 AjaxResult；使用 index-tree.vue 模板时置 true"
+
+# ---- 仅 index-tree.vue.hbs 需要 ----
+
+[tree_code]
+type = "string"
+required = false
+default = "id"
+description = "树节点 ID 字段名（camelCase），如 deptId"
+
+[tree_parent_code]
+type = "string"
+required = false
+default = "parentId"
+description = "父节点字段名（camelCase），如 parentId"
+
+[tree_name]
+type = "string"
+required = false
+default = "name"
+description = "节点显示名称字段名（camelCase），如 deptName"
